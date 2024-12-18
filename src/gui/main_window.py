@@ -87,38 +87,86 @@ class MainWindow(QMainWindow):\
         self.setupShortcuts()
         
     def initUI(self):
+        """Инициализация пользовательского интерфейса"""
         # Установка заголовка и размера окна
         self.setWindowTitle("Rastro")
         self.setGeometry(100, 100, 800, 600)
+        
+        # Установка иконки приложения
+        icon_path = os.path.abspath("src/gui/app-icon.png")
+        if not QIcon(icon_path).isNull():
+            self.setWindowIcon(QIcon(icon_path))
+        else:
+            logger.error(f"Не удалось загрузить иконку по пути: {icon_path}")
 
-        # Установка иконки
-        self.setWindowIcon(QIcon("src/gui/app-icon.ico"))
+        # Создаём меню
+        menubar = self.menuBar()
+        
+        # Меню файла
+        file_menu = menubar.addMenu('Файл')
+        
+        # Действия для меню файла
+        open_action = QAction('Открыть...', self)
+        open_action.setShortcut('Ctrl+O')
+        open_action.triggered.connect(self.load_file)
+        file_menu.addAction(open_action)
+        
+        save_action = QAction('Сохранить', self)
+        save_action.setShortcut('Ctrl+S')
+        save_action.triggered.connect(self.save_file)
+        file_menu.addAction(save_action)
+        
+        save_as_action = QAction('Сохранить как...', self)
+        save_as_action.setShortcut('Ctrl+Shift+S')
+        save_as_action.triggered.connect(self.save_file_as)
+        file_menu.addAction(save_as_action)
+        
+        # Меню изображения
+        image_menu = menubar.addMenu('Вид')
+        resize_action = QAction('Размер холста...', self)
+        resize_action.setShortcut('Ctrl+R')
+        resize_action.triggered.connect(self.show_resize_dialog)
+        image_menu.addAction(resize_action)
 
         # Инициализация холста
         self.canvas = Canvas()
-
-        # Область прокрутки
+        
+        # Создаем область прокрутки для холста
         scroll_area = QScrollArea()
         scroll_area.setWidget(self.canvas)
         scroll_area.setWidgetResizable(False)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        
         self.setCentralWidget(scroll_area)
-
-        # Статус-бар
+        
+        # Настройка статус-бара
         self.statusBar = QStatusBar()
         self.tool_label = QLabel("Инструмент: Кисть")
         self.size_label = QLabel(f"Размер холста: {self.canvas.width()}x{self.canvas.height()}")
         self.statusBar.addPermanentWidget(self.tool_label)
         self.statusBar.addPermanentWidget(self.size_label)
         self.setStatusBar(self.statusBar)
-
-        # Панель инструментов
+        
+        # Создание панели инструментов
         self.createToolBar()
 
-        # Автоматически выбираем кисть
-        self.select_tool("brush")  # <-- Выбор кисти при запуске
-        logger.info("Кисть выбрана по умолчанию")
-
-        # Логирование и завершение инициализации
+        # Добавление системного трея
+        if QSystemTrayIcon.isSystemTrayAvailable():
+            self.tray_icon = QSystemTrayIcon(self)
+            self.tray_icon.setIcon(QIcon(icon_path))
+            tray_menu = QMenu()
+            quit_action = QAction("Выход", self)
+            quit_action.triggered.connect(self.close)
+            tray_menu.addAction(quit_action)
+            self.tray_icon.setContextMenu(tray_menu)
+            self.tray_icon.show()
+            logger.info("Иконка добавлена в системный трей.")
+        else:
+            logger.warning("Системный трей недоступен.")
+        
+        # Установка начального инструмента
+        self.select_tool("brush")
         logger.info("Главное окно инициализировано")
 
 
