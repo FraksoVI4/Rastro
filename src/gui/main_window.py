@@ -91,25 +91,19 @@ class MainWindow(QMainWindow):\
         self.setWindowTitle("Rastro")
         self.setGeometry(100, 100, 800, 600)
 
-        # Установка иконки приложения (для панели задач и заголовка окна)
-        icon_path = os.path.abspath("src/gui/app-icon.png")  # Используйте .ico для Windows
-        if not QIcon(icon_path).isNull():
-            self.setWindowIcon(QIcon(icon_path))
-        else:
-            logger.error(f"Не удалось загрузить иконку по пути: {icon_path}")
+        # Установка иконки
+        self.setWindowIcon(QIcon("src/gui/app-icon.ico"))
 
         # Инициализация холста
         self.canvas = Canvas()
 
-        # Создаем область прокрутки для холста
+        # Область прокрутки
         scroll_area = QScrollArea()
         scroll_area.setWidget(self.canvas)
         scroll_area.setWidgetResizable(False)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setCentralWidget(scroll_area)
 
-        # Настройка статус-бара
+        # Статус-бар
         self.statusBar = QStatusBar()
         self.tool_label = QLabel("Инструмент: Кисть")
         self.size_label = QLabel(f"Размер холста: {self.canvas.width()}x{self.canvas.height()}")
@@ -117,24 +111,16 @@ class MainWindow(QMainWindow):\
         self.statusBar.addPermanentWidget(self.size_label)
         self.setStatusBar(self.statusBar)
 
-        # Создание панели инструментов
+        # Панель инструментов
         self.createToolBar()
 
-        # Добавление системного трея (если требуется)
-        if QSystemTrayIcon.isSystemTrayAvailable():
-            self.tray_icon = QSystemTrayIcon(self)
-            self.tray_icon.setIcon(QIcon(icon_path))
-            tray_menu = QMenu()
-            quit_action = QAction("Выход", self)
-            quit_action.triggered.connect(self.close)
-            tray_menu.addAction(quit_action)
-            self.tray_icon.setContextMenu(tray_menu)
-            self.tray_icon.show()
-            logger.info("Иконка добавлена в системный трей.")
-        else:
-            logger.warning("Системный трей недоступен.")
+        # Автоматически выбираем кисть
+        self.select_tool("brush")  # <-- Выбор кисти при запуске
+        logger.info("Кисть выбрана по умолчанию")
 
+        # Логирование и завершение инициализации
         logger.info("Главное окно инициализировано")
+
 
     def createToolBar(self):
         """Создание панели инструментов"""
