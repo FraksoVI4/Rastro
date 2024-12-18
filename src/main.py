@@ -15,7 +15,7 @@ def main():
         window.show()
         sys.exit(app.exec())
     except Exception as e:
-        logger.error(f"Application crashed: {str(e)}")
+        logger.error(f"Приложение вылетело: {str(e)}")
         raise
 
 if __name__ == "__main__":

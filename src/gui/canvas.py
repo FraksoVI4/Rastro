@@ -139,3 +139,30 @@ class Canvas(QWidget):
             event.accept()
             return
         super().keyPressEvent(event)
+    
+    def save_image(self, filename):
+        """Сохранение изображения"""
+        self.image.save(filename)
+
+    def load_image(self, filename):
+        """Загрузка изображения"""
+        loaded_image = QImage(filename)
+        
+        # Создаем новый холст с размером загруженного изображения
+        new_image = QImage(loaded_image.size(), QImage.Format.Format_RGB32)
+        new_image.fill(Qt.GlobalColor.white)
+        
+        # Рисуем загруженное изображение
+        painter = QPainter(new_image)
+        painter.drawImage(0, 0, loaded_image)
+        painter.end()
+        
+        # Обновляем изображение и размер
+        self.image = new_image
+        self.setFixedSize(loaded_image.size())
+        
+        # Обновляем историю
+        self.history.undo_stack.clear()
+        self.history.push_state(self.image)
+        
+        self.update()
