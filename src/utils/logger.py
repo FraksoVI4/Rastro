@@ -16,7 +16,7 @@ def setup_logger():
     # Хендлер для записи в файл
     file_handler = logging.FileHandler(
         f'log_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log',
-        encoding='utf-8'  # Важно для русского языка
+        encoding='utf-8'
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
