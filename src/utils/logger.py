@@ -58,3 +58,16 @@ class RastroLogger:
 
 # Создаем глобальный экземпляр логгера
 rastro_logger = RastroLogger()
+
+def setup_logger():
+    """
+    Функция для обратной совместимости.
+    Настраивает и возвращает логгер в старом стиле.
+    """
+    return rastro_logger.logger
+
+def get_logger():
+    """
+    Возвращает глобальный экземпляр логгера.
+    """
+    return rastro_logger

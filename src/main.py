@@ -1,5 +1,12 @@
 import sys
-import logging
+import os
+from pathlib import Path
+
+# Добавляем текущую директорию в путь для импортов
+current_dir = Path(__file__).parent
+if str(current_dir) not in sys.path:
+    sys.path.insert(0, str(current_dir))
+
 from PyQt6.QtWidgets import QApplication
 from gui.main_window import MainWindow
 from utils.logger import setup_logger
@@ -7,7 +14,6 @@ from utils.logger import setup_logger
 def main():
     # Настраиваем логирование
     setup_logger()
-    logger = logging.getLogger(__name__)
     
     try:
         app = QApplication(sys.argv)
@@ -15,8 +21,8 @@ def main():
         window.show()
         sys.exit(app.exec())
     except Exception as e:
-        logger.error(f"Приложение вылетело: {str(e)}")
-        raise
+        print(f"Ошибка: {str(e)}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
